@@ -1,0 +1,51 @@
+name: Compilar APK AIDA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar projeto
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extrair AIDA
+        run: |
+          unzip -q AIDA_7_4_0_XADREZ_MIC_VOZ_PROJETO.zip -d projeto
+
+      - name: Encontrar Gradle
+        id: gradle
+        run: |
+          WRAPPER=$(find projeto -type f -name gradlew | head -1)
+          if [ -z "$WRAPPER" ]; then
+            echo "gradlew não encontrado"
+            exit 1
+          fi
+          DIR=$(dirname "$WRAPPER")
+          echo "dir=$DIR" >> "$GITHUB_OUTPUT"
+          chmod +x "$WRAPPER"
+
+      - name: Compilar AIDA
+        working-directory: ${{ steps.gradle.outputs.dir }}
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Preparar APK
+        run: |
+          mkdir -p apk-final
+          find projeto -type f -name "*.apk" -exec cp {} apk-final/ \;
+
+      - name: Salvar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: AIDA-7.4.0-APK
+          path: apk-final/*.apk
