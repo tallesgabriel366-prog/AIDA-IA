@@ -21,7 +21,7 @@ jobs:
 
       - name: Extrair AIDA
         run: |
-          unzip -q AIDA_7_4_0_XADREZ_MIC_VOZ_PROJETO.zip -d projeto
+          unzip -q AIDA_7_4_1_XADREZ_VISIVEL_PROJETO.zip -d projeto
 
       - name: Encontrar Gradle
         id: gradle
@@ -47,5 +47,5 @@ jobs:
       - name: Salvar APK
         uses: actions/upload-artifact@v4
         with:
-          name: AIDA-7.4.0-APK
+          name: AIDA-7.4.1-APK
           path: apk-final/*.apk
